@@ -5,11 +5,15 @@
 **a. Initial design**
 
 - Briefly describe your initial UML design.
+I want my system to be able for the User to add a pet that they can track what they need to be feed and what execersies they have to do. The app should have daily tasks for the pet so the  User can interact with it and complete them. It will also include a grooming section where it tells the User based of the pet they have when should they have the dog groomed and showered and everything. Also when the user is checking off the tasks should be able to track pets improvment overtime which is getting faster or losing weight or whatever things it can track. When adding it pet has to include the breed , weight , and color.
 - What classes did you include, and what responsibilities did you assign to each?
+So the main objects and class are going to be the Owner who owns the pet and it contains a name , and preferences. Next is the Pet which containts a name , species or breed, and age. Next is the Task which has the title , duration of minutes , the priority of the task like how important it is and category of what it is, then a completed boolean value. Then we have a Scheduler which has the Owner , contains the pet and tasks then it generates a plan which coorelates to a Daily plan containing all the tasks and how long it will take.  
+
 
 **b. Design changes**
 
 - Did your design change during implementation?
+Yes during implementation it generated it a little differently than the diagram hwoever it implemented eveyrthing it generated from the diagram recarding the priority levels of the tasks and it comes down to the scheduler and daily plan it seemed very stable and it would run efficiently
 - If yes, describe at least one change and why you made it.
 
 ---
