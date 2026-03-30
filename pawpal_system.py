@@ -48,6 +48,11 @@ class Task:
         """Mark this task as completed."""
         self.completed = True
 
+    def renew(self) -> "Task":
+        """Return a fresh copy of this recurring task for the next occurrence."""
+        from dataclasses import replace
+        return replace(self, completed=False)
+
     def start_minutes(self) -> int | None:
         """Return start time as total minutes from midnight, or None."""
         if self.start_time is None:
