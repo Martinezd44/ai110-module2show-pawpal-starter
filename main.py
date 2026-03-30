@@ -25,6 +25,11 @@ def run_schedule(owner: Owner, pet: Pet, tasks: list[Task]) -> None:
         for task in plan.skipped_tasks:
             print(f"   - {task.title} — {task.duration_minutes} min")
 
+    if plan.conflicts:
+        print("\n ⚠ Time conflicts:")
+        for a, b in plan.conflicts:
+            print(f"   {a.title} ({a.start_time}) overlaps {b.title} ({b.start_time})")
+
     print(f"\n Total time used: {plan.total_minutes} / {owner.available_minutes} min")
     print(f"{'='*45}\n")
 
