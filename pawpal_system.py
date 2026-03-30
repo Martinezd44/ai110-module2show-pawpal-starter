@@ -18,6 +18,15 @@ class Pet:
     name: str
     species: str = "dog"
     age: int = 1
+    tasks: list["Task"] = field(default_factory=list)
+
+    def add_task(self, task: "Task") -> None:
+        """Add a task to this pet's task list."""
+        self.tasks.append(task)
+
+    def task_count(self) -> int:
+        """Return the number of tasks assigned to this pet."""
+        return len(self.tasks)
 
 
 @dataclass
@@ -31,6 +40,10 @@ class Task:
     def priority_value(self) -> int:
         """Lower number = higher priority."""
         return PRIORITY_ORDER.get(self.priority, 1)
+
+    def mark_complete(self) -> None:
+        """Mark this task as completed."""
+        self.completed = True
 
 
 @dataclass
@@ -66,6 +79,7 @@ class DailyPlan:
 
 class Scheduler:
     def __init__(self, owner: Owner, pet: Pet, tasks: list[Task]):
+        """Initialize the scheduler with an owner, a pet, and a list of tasks."""
         self.owner = owner
         self.pet = pet
         self.tasks = tasks
