@@ -227,10 +227,13 @@ sort_by = st.radio(
     ),
 )
 
+PRIORITY_BADGE = {"high": "🔴 high", "medium": "🟡 medium", "low": "🟢 low"}
+
 if st.button("Generate Schedule"):
     pending_tasks = [t for t in active_pet.tasks if not t.completed]
+
     if not pending_tasks:
-        st.warning("No pending tasks to schedule.")
+        st.warning(f"No pending tasks found for {active_pet.name}. Add tasks above first.")
     else:
         scheduler = Scheduler(
             owner=st.session_state.owner,
@@ -239,9 +242,50 @@ if st.button("Generate Schedule"):
         )
         plan = scheduler.generate_plan(sort_by=sort_by)
 
-        if plan.conflicts:
-            st.error(f"⚠️ {len(plan.conflicts)} time conflict(s) detected in this schedule.")
-        else:
-            st.success(f"Schedule generated for {active_pet.name}!")
+        # ── Summary metrics ───────────────────────────────────────────────────
+        st.divider()
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Scheduled", f"{len(plan.scheduled_tasks)} tasks")
+        m2.metric("Time used", f"{plan.total_minutes} min")
+        m3.metric("Available", f"{st.session_state.owner.available_minutes} min")
+        m4.metric("Skipped", f"{len(plan.skipped_tasks)} tasks")
 
-        st.markdown(plan.explain())
+        # ── Conflict alerts ───────────────────────────────────────────────────
+        if plan.conflicts:
+            st.error(f"⚠️ {len(plan.conflicts)} time conflict(s) detected — review start times.")
+            for a, b in plan.conflicts:
+                st.warning(
+                    f"**{a.title}** ({a.start_time}, {a.duration_minutes} min) "
+                    f"overlaps **{b.title}** ({b.start_time}, {b.duration_minutes} min)"
+                )
+        else:
+            st.success(f"Schedule ready for {active_pet.name} — no conflicts detected!")
+
+        # ── Scheduled tasks table ─────────────────────────────────────────────
+        if plan.scheduled_tasks:
+            st.markdown("#### Scheduled Tasks")
+            st.table([
+                {
+                    "title":    t.title,
+                    "priority": PRIORITY_BADGE.get(t.priority, t.priority),
+                    "category": t.category,
+                    "start":    t.start_time or "—",
+                    "duration": f"{t.duration_minutes} min",
+                    "recurs":   f"↻ {t.recurrence}" if t.recurring else "—",
+                }
+                for t in plan.scheduled_tasks
+            ])
+
+        # ── Skipped tasks ─────────────────────────────────────────────────────
+        if plan.skipped_tasks:
+            st.markdown("#### Skipped Tasks")
+            st.caption("These tasks did not fit within the available time budget.")
+            st.table([
+                {
+                    "title":    t.title,
+                    "priority": PRIORITY_BADGE.get(t.priority, t.priority),
+                    "duration": f"{t.duration_minutes} min",
+                    "reason":   "over time budget",
+                }
+                for t in plan.skipped_tasks
+            ])
